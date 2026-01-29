@@ -48,7 +48,15 @@ export default function GalleryPage({ onSelectImage }) {
 
           <div className="pe-gallery">
             {images.map((img) => {
-              const thumb = img.editedDataUrl || img.originalDataUrl || img.url;
+              const thumb =
+                img.editedDataUrl ||
+                img.originalDataUrl ||
+                // LIVE API: prefer explicit url (from GET /images/{id}), otherwise derive from API base.
+                img.url ||
+                (process.env.REACT_APP_API_BASE_URL
+                  ? `${process.env.REACT_APP_API_BASE_URL.replace(/\/+$/, "")}/images/${img.id}/file`
+                  : "");
+              const created = img.createdAt || img.created_at;
               return (
                 <button
                   key={img.id}
@@ -61,7 +69,7 @@ export default function GalleryPage({ onSelectImage }) {
                   <div className="pe-thumb__meta">
                     <div className="pe-thumb__title">{img.title || "Untitled"}</div>
                     <div className="pe-thumb__sub">
-                      {img.createdAt ? new Date(img.createdAt).toLocaleString() : ""}
+                      {created ? new Date(created).toLocaleString() : ""}
                     </div>
                   </div>
                 </button>

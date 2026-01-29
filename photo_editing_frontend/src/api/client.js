@@ -254,16 +254,21 @@ export const api = {
    */
   async login({ email, password }) {
     if (isMockModeEnabled()) return mockLogin({ email, password });
-    return apiRequest("/auth/login", { method: "POST", body: { email, password } });
+    const res = await apiRequest("/auth/login", { method: "POST", body: { email, password } });
+    // Backend uses OAuth-style fields: {access_token, token_type}
+    return { token: res.access_token, user: null };
   },
 
   /**
    * PUBLIC_INTERFACE
    * Register a user. In real mode, this expects POST /auth/register {email,password}.
+   *
+   * Note: backend register returns user only; frontend will stay logged out until login.
    */
   async register({ email, password }) {
     if (isMockModeEnabled()) return mockRegister({ email, password });
-    return apiRequest("/auth/register", { method: "POST", body: { email, password } });
+    await apiRequest("/auth/register", { method: "POST", body: { email, password } });
+    return { token: "", user: null };
   },
 
   /**
@@ -329,7 +334,7 @@ export const api = {
 
   /**
    * PUBLIC_INTERFACE
-   * Save edited image. In real mode, expects POST /images/{id}/save {editedDataUrl|...}
+   * Save edited image. In real mode, expects POST /images/{id}/save {editedDataUrl}
    */
   async saveEditedImage({ id, editedDataUrl }) {
     if (isMockModeEnabled()) return mockSaveEditedImage({ id, editedDataUrl });

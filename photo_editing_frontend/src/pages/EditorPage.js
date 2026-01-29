@@ -56,7 +56,8 @@ export default function EditorPage({ imageId, onSaved }) {
 
   const src = useMemo(() => {
     if (!image) return "";
-    return image.originalDataUrl || image.url || "";
+    // Mock mode stores data URLs; LIVE mode uses backend file URL.
+    return image.originalDataUrl || image.editedDataUrl || image.url || "";
   }, [image]);
 
   const displayUrl = useMemo(() => {
